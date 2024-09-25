@@ -16,7 +16,7 @@ let
   mount = "${pkgs.util-linux}/bin/mount";
   unmountScript = mountPoint: tries: sleep: ''
     triesLeft=${toString tries}
-    if ${mount} | grep -F ${mountPoint}' ' >/dev/null; then
+    if ${mount} | grep -F " ${mountPoint}"' ' >/dev/null; then
         while (( triesLeft > 0 )); do
             if fusermount -u ${mountPoint}; then
                 break
@@ -264,7 +264,7 @@ in
             bindfs = "bindfs" + bindfsOptionFlag;
             startScript = pkgs.writeShellScript name ''
               set -eu
-              if ! mount | grep -F ${mountPoint}' ' && ! mount | grep -F ${mountPoint}/; then
+              if ! mount | grep -F " ${mountPoint}"' ' && ! mount | grep fuse | grep -F ${mountPoint}/; then
                   mkdir -p ${mountPoint}
                   exec ${bindfs} ${targetDir} ${mountPoint}
               else
@@ -357,9 +357,9 @@ in
             mkdir -p ${targetDir}
             mkdir -p ${mountPoint}
 
-            if ${mount} | grep -F ${mountPoint}' ' >/dev/null; then
-                if ! ${mount} | grep -F ${mountPoint}' ' | grep -F bindfs; then
-                    if ! ${mount} | grep -F ${mountPoint}' ' | grep -F ${targetDir}' ' >/dev/null; then
+            if ${mount} | grep -F " ${mountPoint}"' ' >/dev/null; then
+                if ! ${mount} | grep -F " ${mountPoint}"' ' | grep -F bindfs; then
+                    if ! ${mount} | grep -F " ${mountPoint}"' ' | grep -F ${targetDir}' ' >/dev/null; then
                         # The target directory changed, so we need to remount
                         echo "remounting ${mountPoint}"
                         ${systemctl} --user stop bindMount-${sanitizeName targetDir}
